@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nebula Agar - Supervivencia Orbital Definitiva</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #19142e;
+            color: #F8F3FF;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px 10px;
+        }
+
+        .contenedor {
+            max-width: 850px;
+            margin: auto;
+        }
+
+        .etiqueta {
+            color: #E7A9CF;
+            font-size: 12px;
+            letter-spacing: 3px;
+            font-weight: bold;
+        }
+
+        h1 {
+            font-size: 42px;
+            margin: 8px 0;
+            letter-spacing: 2px;
+        }
+
+        h1 span {
+            color: #B69AE8;
+        }
+
+        .subtitulo {
+            color: #C9BEDD;
+            margin-bottom: 18px;
+            font-size: 14px;
+        }
+
+        .panel {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .dato {
+            background: #272142;
+            border: 1px solid #66538D;
+            border-radius: 12px;
+            padding: 10px 18px;
+            min-width: 130px;
+        }
+
+        .dato small {
+            display: block;
+            color: #C9BEDD;
+            font-size: 10px;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .dato strong {
+            color: #F7D98B;
+            font-size: 20px;
+        }
+
+        .zona-juego {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: #110d1f;
+            border: 3px solid #9B83D5;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(155, 131, 213, 0.3);
+            touch-action: none;
+            user-select: none;
+            cursor: crosshair;
+        }
+
+        .pantalla {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(17, 13, 31, 0.92);
+            border-radius: 15px;
+            padding: 15px;
+            z-index: 10;
+            backdrop-filter: blur(4px);
+        }
+
+        .oculto {
+            display: none !important;
+        }
+
+        .tarjeta {
+            background: #272142;
+            border: 2px solid #9B83D5;
+            border-radius: 18px;
+            padding: 24px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .tarjeta h2 {
+            color: #D9C7FF;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .tarjeta p {
+            color: #E3DCEC;
+            line-height: 1.5;
+            margin-bottom: 16px;
+            font-size: 13px;
+        }
+
+        .decoracion {
+            color: #F7D98B;
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .input-nombre {
+            width: 100%;
+            padding: 11px 14px;
+            margin-bottom: 16px;
+            border-radius: 10px;
+            border: 2px solid #66538D;
+            background: #110d1f;
+            color: #F8F3FF;
+            font-size: 15px;
+            text-align: center;
+            outline: none;
+        }
+
+        .input-nombre:focus {
+            border-color: #F7D98B;
+        }
+
+        .resumen-stats {
+            background: #19142e;
+            border: 1px solid #66538D;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-around;
+            gap: 8px;
+        }
+
+        .resumen-stats div small {
+            display: block;
+            font-size: 10px;
+            color: #C9BEDD;
+            margin-bottom: 3px;
+        }
+
+        .resumen-stats div strong {
+            color: #F7D98B;
+            font-size: 16px;
+        }
+
+        .medalla-logro {
+            background: #393059;
+            color: #F7D98B;
+            font-size: 12px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border: 1px dashed #F7D98B;
+        }
+
+        button {
+            background: #9B83D5;
+            color: #19142e;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 26px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #C5A9F5;
+            transform: scale(1.03);
+        }
+
+        /* CONTROLES TÁCTILES */
+        .zona-controles-tactiles {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .fila-controles-movil {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .pad-direccional {
+            display: grid;
+            grid-template-columns: repeat(3, 56px);
+            grid-template-rows: repeat(3, 56px);
+            gap: 6px;
+            background: #221b3b;
+            padding: 8px;
+            border-radius: 20px;
+            border: 2px solid #66538D;
+        }
+
+        .btn-control {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            background: #322952;
+            border: 2px solid #9B83D5;
+            color: #F7D98B;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            outline: none;
+            box-shadow: 0 3px 0 #151125;
+        }
+
+        .btn-control:active, .btn-control.presionado {
+            background: #9B83D5 !important;
+            color: #19142e !important;
+            transform: translateY(2px);
+        }
+
+        .btn-arriba { grid-column: 2; grid-row: 1; }
+        .btn-izq { grid-column: 1; grid-row: 2; }
+        .centro-pad { grid-column: 2; grid-row: 2; display: flex; justify-content: center; align-items: center; font-size: 20px; pointer-events: none; }
+        .btn-der { grid-column: 3; grid-row: 2; }
+        .btn-abajo { grid-column: 2; grid-row: 3; }
+
+        .botones-accion-movil {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-accion-circular {
+            width: 82px;
+            height: 82px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #3c2f61, #221b3b);
+            border: 2px solid #F7D98B;
+            color: #F7D98B;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 11px;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #151125;
+        }
+
+        .btn-accion-circular span { font-size: 20px; }
+
+        .btn-accion-circular:active, .btn-accion-circular.presionado {
+            background: #F7D98B !important;
+            color: #19142e !important;
+            transform: translateY(3px);
+        }
+
+        .ayuda-tactil {
+            color: #C9BEDD;
+            font-size: 12px;
+            max-width: 500px;
+            line-height: 1.4;
+        }
+
+        .instrucciones {
+            background: #272142;
+            border: 1px solid #66538D;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            font-size: 12px;
+        }
+
+        .instrucciones h3 {
+            color: #D9C7FF;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .controles {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .controles span {
+            background: #19142e;
+            border: 1px solid #9B83D5;
+            padding: 7px 10px;
+            border-radius: 6px;
+            color: #F7D98B;
+        }
+
+        .instrucciones p {
+            color: #C9BEDD;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
+        footer {
+            color: #9588AD;
+            font-size: 11px;
+            margin-top: 18px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="contenedor">
+
+        <header>
+            <span class="etiqueta">✦ SUPERVIVENCIA ORBITAL AVANZADA ✦</span>
+            <h1>Nebula <span>Agar</span></h1>
+            <p class="subtitulo">
+                Absorbe polvo estelar, esquiva cometas, domina agujeros negros y libera supernovas.
+            </p>
+        </header>
+
+        <section class="panel">
+            <div class="dato">
+                <small>⭐ MASA / PUNTOS</small>
+                <strong id="puntuacion">28</strong>
+            </div>
+
+            <div class="dato">
+                <small>🏆 POSICIÓN</small>
+                <strong id="posicion">#12 / 12</strong>
+            </div>
+
+            <div class="dato">
+                <small>☄️ RANGO</small>
+                <strong id="rango">Asteroide</strong>
+            </div>
+        </section>
+
+        <section class="zona-juego">
+
+            <canvas id="juego" width="800" height="500">
+                Tu navegador no admite Canvas.
+            </canvas>
+
+            <!-- PANTALLA DE INICIO -->
+            <div id="pantallaInicio" class="pantalla">
+                <div class="tarjeta">
+                    <div class="decoracion">✧ ✦ ✧</div>
+                    <h2>Nebula Agar: Edición Estelar</h2>
+                    <p>
+                        Crece devorando cuerpos menores. Cuidado con los planetas masivos, activa tu <b>Impulso (Espacio)</b> y desata ondas de <b>Supernova (E)</b> para barrer el sector.
+                    </p>
+                    <input type="text" id="inputNombre" class="input-nombre" maxlength="14" placeholder="Nombre de tu planeta (Ej. Titán)">
+                    <button id="btnIniciar">Comenzar Órbita</button>
+                </div>
+            </div>
+
+            <!-- PANTALLA DE GAME OVER / VICTORIA -->
+            <div id="pantallaFinal" class="pantalla oculto">
+                <div class="tarjeta">
+                    <div class="decoracion">✦ ✧ ✦</div>
+                    <h2 id="mensajeFinal">¡Órbita colapsada!</h2>
+                    <p id="resultadoFinal"></p>
+                    <div id="contenedorMedalla" class="medalla-logro oculto">🏆 Logro desbloqueado: <span id="textoMedalla"></span></div>
+                    <div class="resumen-stats">
+                        <div>
+                            <small>⭐ MASA MÁXIMA</small>
+                            <strong id="statMasaMax">0</strong>
+                        </div>
+                        <div>
+                            <small>🪐 ABSORBIDOS</small>
+                            <strong id="statAbsorbidos">0</strong>
+                        </div>
+                    </div>
+                    <button id="btnReiniciar">Volver a Jugar</button>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- CONTROLES TÁCTILES MÓVILES -->
+        <section class="zona-controles-tactiles" id="controlesTactiles">
+            <div class="fila-controles-movil">
+                <div class="pad-direccional">
+                    <button type="button" class="btn-control btn-arriba" data-dir="ArrowUp">▲</button>
+                    <button type="button" class="btn-control btn-izq" data-dir="ArrowLeft">◀</button>
+                    <div class="centro-pad">🪐</div>
+                    <button type="button" class="btn-control btn-der" data-dir="ArrowRight">▶</button>
+                    <button type="button" class="btn-control btn-abajo" data-dir="ArrowDown">▼</button>
+                </div>
+
+                <div class="botones-accion-movil">
+                    <button type="button" class="btn-accion-circular" id="btnImpulso">
+                        <span>⚡</span>
+                        IMPULSO
+                    </button>
+                    <button type="button" class="btn-accion-circular" id="btnSupernova">
+                        <span>🌟</span>
+                        NOVA
+                    </button>
+                </div>
+            </div>
+            <p class="ayuda-tactil">
+                📱 Arrastra el dedo por el espacio o usa la cruceta. Usa <strong>⚡ Impulso</strong> y <strong>🌟 Supernova</strong> (cuando esté cargada).
+            </p>
+        </section>
+
+        <section class="instrucciones">
+            <h3>Controles y Mecánicas Galácticas</h3>
+            <div class="controles">
+                <span>↑↓←→ / WASD (Mover)</span>
+                <span>Espacio (Impulso)</span>
+                <span>E / Click (Supernova)</span>
+            </div>
+            <p>
+                🪐 <strong>Absorción:</strong> Absorbe objetivos al menos un <strong>12% más pequeños</strong>.<br>
+                ☄️ <strong>Cometas:</strong> Atraviesan el mapa a gran velocidad. ¡Absorbe sus fragmentos para ganar masa extra!<br>
+                🏆 <strong>Meta:</strong> Alcanza <strong>1,800 de masa</strong> para convertirte en una Supernova legendaria.
+            </p>
+        </section>
+
+        <footer>
+            ✦ Nebula Agar · Versión Mejorada 2026 ✦
+        </footer>
+
+    </main>
+
+    <script>
+        const canvas = document.getElementById("juego");
+        const ctx = canvas.getContext("2d");
+
+        const anchoVista = 800;
+        const altoVista = 500;
+        const MUNDO_ANCHO = 2400;
+        const MUNDO_ALTO = 2400;
+
+        const elPuntuacion = document.getElementById("puntuacion");
+        const elPosicion = document.getElementById("posicion");
+        const elRango = document.getElementById("rango");
+        const pantallaInicio = document.getElementById("pantallaInicio");
+        const pantallaFinal = document.getElementById("pantallaFinal");
+        const inputNombre = document.getElementById("inputNombre");
+        const mensajeFinal = document.getElementById("
