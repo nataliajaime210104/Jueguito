@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Galactic Defender - Arcade Espacial</title>
+    <title>Galactic Defender - Menú y Vistas</title>
 
     <style>
         * {
@@ -18,7 +18,7 @@
             color: #F8F3FF;
             font-family: Arial, sans-serif;
             text-align: center;
-            padding: 15px 10px;
+            padding: 20px 10px;
             overflow-x: hidden;
         }
 
@@ -35,7 +35,7 @@
         }
 
         h1 {
-            font-size: 38px;
+            font-size: 36px;
             margin: 6px 0;
             letter-spacing: 2px;
         }
@@ -50,73 +50,49 @@
             font-size: 13px;
         }
 
-        .panel {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 12px;
-        }
-
-        .dato {
-            background: #20193a;
-            border: 1px solid #554488;
-            border-radius: 10px;
-            padding: 8px 16px;
-            min-width: 120px;
-        }
-
-        .dato small {
-            display: block;
-            color: #C9BEDD;
-            font-size: 9px;
-            margin-bottom: 3px;
-            letter-spacing: 0.5px;
-        }
-
-        .dato strong {
-            color: #FFD27F;
-            font-size: 18px;
-        }
-
-        .zona-juego {
+        /* CONTENEDOR DE VISTAS */
+        .contenedor-vistas {
             position: relative;
             width: 100%;
             max-width: 700px;
+            height: 450px;
             margin: auto;
+            background: #080512;
+            border: 3px solid #7B62CE;
+            border-radius: 14px;
+            box-shadow: 0 0 25px rgba(123, 98, 206, 0.35);
+            overflow: hidden;
+        }
+
+        .vista {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #080512;
+            padding: 20px;
+            transition: opacity 0.3s ease-in-out;
+            z-index: 1;
+        }
+
+        .vista.oculta {
+            opacity: 0;
+            pointer-events: none;
+            z-index: 0;
         }
 
         canvas {
             display: block;
             width: 100%;
-            height: auto;
-            background: #080512;
-            border: 3px solid #7B62CE;
-            border-radius: 14px;
-            box-shadow: 0 0 25px rgba(123, 98, 206, 0.35);
+            height: 100%;
             touch-action: none;
-            user-select: none;
             cursor: crosshair;
         }
 
-        .pantalla {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: rgba(10, 7, 24, 0.9);
-            border-radius: 14px;
-            padding: 15px;
-            z-index: 10;
-            backdrop-filter: blur(4px);
-        }
-
-        .oculto {
-            display: none !important;
-        }
-
-        .tarjeta {
+        /* TARJETAS Y MENÚS */
+        .tarjeta-menu {
             background: #20193a;
             border: 2px solid #7B62CE;
             border-radius: 16px;
@@ -126,23 +102,131 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
-        .tarjeta h2 {
+        .tarjeta-menu h2 {
             color: #E2D4FF;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             font-size: 22px;
         }
 
-        .tarjeta p {
+        .tarjeta-menu p {
             color: #D2C8EC;
             line-height: 1.4;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
             font-size: 13px;
         }
 
-        .decoracion {
+        .grupo-botones {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+        button {
+            background: #7B62CE;
+            color: #F8F3FF;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 20px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+        }
+
+        button:hover {
+            background: #9D84E8;
+            transform: scale(1.02);
+        }
+
+        button.secundario {
+            background: #352a5a;
+            border: 1px solid #7B62CE;
+        }
+
+        button.secundario:hover {
+            background: #4a3c7c;
+        }
+
+        /* PANEL SUPERIOR DE JUEGO HUD */
+        .hud-juego {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 14px;
+            background: rgba(32, 25, 58, 0.75);
+            border: 1px solid #554488;
+            border-radius: 8px;
+            font-size: 13px;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .hud-juego strong {
             color: #FFD27F;
-            font-size: 22px;
-            margin-bottom: 8px;
+        }
+
+        /* CONTROLES TÁCTILES MÓVILES EN JUEGO */
+        .zona-controles-tactiles {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
+            z-index: 5;
+        }
+
+        .grupo-movimiento {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-control {
+            width: 60px;
+            height: 48px;
+            border-radius: 12px;
+            background: #251e44;
+            border: 2px solid #7B62CE;
+            color: #FFD27F;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-control:active, .btn-control.presionado {
+            background: #7B62CE !important;
+            color: #0f0b1e !important;
+        }
+
+        .btn-disparo {
+            width: 85px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(145deg, #a8466b, #6b2641);
+            border: 2px solid #FF88B2;
+            color: #FFE5EE;
+            font-weight: bold;
+            font-size: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .btn-disparo:active, .btn-disparo.presionado {
+            background: #FF88B2 !important;
+            color: #361120 !important;
         }
 
         .resumen-stats {
@@ -164,101 +248,7 @@
 
         .resumen-stats div strong {
             color: #FFD27F;
-            font-size: 16px;
-        }
-
-        button {
-            background: #7B62CE;
-            color: #F8F3FF;
-            border: none;
-            border-radius: 25px;
-            padding: 11px 26px;
             font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        button:hover {
-            background: #9D84E8;
-            transform: scale(1.04);
-        }
-
-        /* CONTROLES TÁCTILES MÓVILES */
-        .zona-controles-tactiles {
-            margin-top: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 10px;
-        }
-
-        .grupo-movimiento {
-            display: flex;
-            gap: 12px;
-        }
-
-        .btn-control {
-            width: 68px;
-            height: 54px;
-            border-radius: 14px;
-            background: #251e44;
-            border: 2px solid #7B62CE;
-            color: #FFD27F;
-            font-size: 22px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            box-shadow: 0 4px 0 #120d24;
-        }
-
-        .btn-control:active, .btn-control.presionado {
-            background: #7B62CE !important;
-            color: #0f0b1e !important;
-            transform: translateY(3px);
-            box-shadow: 0 1px 0 #120d24 !important;
-        }
-
-        .btn-disparo {
-            width: 90px;
-            height: 54px;
-            border-radius: 14px;
-            background: linear-gradient(145deg, #a8466b, #6b2641);
-            border: 2px solid #FF88B2;
-            color: #FFE5EE;
-            font-weight: bold;
-            font-size: 13px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 4px 0 #361120;
-        }
-
-        .btn-disparo:active, .btn-disparo.presionado {
-            background: #FF88B2 !important;
-            color: #361120 !important;
-            transform: translateY(3px);
-            box-shadow: 0 1px 0 #361120 !important;
-        }
-
-        .instrucciones {
-            background: #20193a;
-            border: 1px solid #554488;
-            border-radius: 10px;
-            padding: 12px;
-            margin-top: 12px;
-            font-size: 11px;
-            color: #C9BEDD;
-        }
-
-        .instrucciones h3 {
-            color: #E2D4FF;
-            margin-bottom: 6px;
-            font-size: 12px;
         }
 
         footer {
@@ -274,342 +264,281 @@
     <main class="contenedor">
 
         <header>
-            <span class="etiqueta">✦ ARCADE DEFENSE ✦</span>
+            <span class="etiqueta">✦ NAVEGACIÓN DE VISTAS ✦</span>
             <h1>Galactic <span>Defender</span></h1>
-            <p class="subtitulo">
-                Destruye meteoritos, abate naves enemigas y sobrevive al sector hostil.
-            </p>
+            <p class="subtitulo">Sistema modular con cambio de vistas funcional.</p>
         </header>
 
-        <section class="panel">
-            <div class="dato">
-                <small>⭐ PUNTUACIÓN</small>
-                <strong id="puntuacion">0</strong>
-            </div>
+        <!-- CONTENEDOR PRINCIPAL DE VISTAS -->
+        <div class="contenedor-vistas">
 
-            <div class="dato">
-                <small>❤️ VIDA</small>
-                <strong id="vidas">100%</strong>
-            </div>
-
-            <div class="dato">
-                <small>🌊 OLEADA</small>
-                <strong id="oleada">1</strong>
-            </div>
-        </section>
-
-        <section class="zona-juego">
-            <canvas id="juego" width="700" height="450">
-                Tu navegador no admite Canvas.
-            </canvas>
-
-            <!-- PANTALLA DE INICIO -->
-            <div id="pantallaInicio" class="pantalla">
-                <div class="tarjeta">
-                    <div class="decoracion">✧ 🚀 ✧</div>
-                    <h2>Galactic Defender</h2>
-                    <p>
-                        Maneja tu nave espacial con las flechas o los botones táctiles. Dispara con la barra espaciadora y destruye todo a tu paso.
-                    </p>
-                    <button id="btnIniciar">Iniciar Misión</button>
+            <!-- VISTA 1: MENÚ PRINCIPAL -->
+            <div id="vistaMenu" class="vista">
+                <div class="tarjeta-menu">
+                    <div style="font-size: 24px; margin-bottom: 8px;">✧ 🚀 ✧</div>
+                    <h2>Menú Principal</h2>
+                    <p>Selecciona una opción para navegar entre las vistas de la aplicación.</p>
+                    <div class="grupo-botones">
+                        <button id="btnIrJuego">🎮 Jugar Partida</button>
+                        <button id="btnIrOpciones" class="secundario">⚙️ Opciones / Controles</button>
+                    </div>
                 </div>
             </div>
 
-            <!-- PANTALLA DE GAME OVER -->
-            <div id="pantallaFinal" class="pantalla oculto">
-                <div class="tarjeta">
-                    <div class="decoracion">💥 💀 💥</div>
-                    <h2>¡Nave Destruida!</h2>
-                    <p>Tu sector ha caído ante las fuerzas estelares enemigas.</p>
+            <!-- VISTA 2: OPCIONES / INSTRUCCIONES -->
+            <div id="vistaOpciones" class="vista oculta">
+                <div class="tarjeta-menu">
+                    <div style="font-size: 24px; margin-bottom: 8px;">⚙️ 📖 ⚙️</div>
+                    <h2>Instrucciones</h2>
+                    <p>
+                        ⌨️ <strong>PC:</strong> Muevete con flechas <strong>← / →</strong> y dispara con <strong>Espacio</strong>.<br><br>
+                        📱 <strong>Móvil:</strong> Utiliza los botones táctiles en pantalla durante el juego.
+                    </p>
+                    <button id="btnVolverMenu" class="secundario">← Volver al Menú</button>
+                </div>
+            </div>
+
+            <!-- VISTA 3: ZONA DE JUEGO (CANVAS) -->
+            <div id="vistaJuego" class="vista oculta" style="padding: 0;">
+                <div class="hud-juego">
+                    <div>⭐ Puntos: <strong id="hudPuntos">0</strong></div>
+                    <div>❤️ Vida: <strong id="hudVida">100%</strong></div>
+                    <div>🌊 Oleada: <strong id="hudOleada">1</strong></div>
+                </div>
+
+                <canvas id="canvasJuego" width="700" height="450"></canvas>
+
+                <!-- Controles táctiles exclusivos de la vista de juego -->
+                <div class="zona-controles-tactiles">
+                    <div class="grupo-movimiento">
+                        <button type="button" class="btn-control" data-dir="ArrowLeft">◀</button>
+                        <button type="button" class="btn-control" data-dir="ArrowRight">▶</button>
+                    </div>
+                    <button type="button" class="btn-disparo" id="btnDisparoMovil">⚡ DISPARAR</button>
+                </div>
+            </div>
+
+            <!-- VISTA 4: GAME OVER / RESULTADOS -->
+            <div id="vistaGameOver" class="vista oculta">
+                <div class="tarjeta-menu">
+                    <div style="font-size: 24px; margin-bottom: 8px;">💥 💀 💥</div>
+                    <h2>Fin de la Misión</h2>
+                    <p>Tu nave ha sido destruida en el sector estelar.</p>
                     <div class="resumen-stats">
                         <div>
-                            <small>⭐ PUNTOS FINALES</small>
-                            <strong id="statPuntaje">0</strong>
+                            <small>PUNTUACIÓN</small>
+                            <strong id="statFinalPuntos">0</strong>
                         </div>
                         <div>
-                            <small>☄️ METEORITOS DERROTADOS</small>
-                            <strong id="statMeteoritos">0</strong>
+                            <small>DESTRUIDOS</small>
+                            <strong id="statFinalMeteoritos">0</strong>
                         </div>
                     </div>
-                    <button id="btnReiniciar">Jugar de Nuevo</button>
+                    <div class="grupo-botones">
+                        <button id="btnReintentar">🔄 Jugar de Nuevo</button>
+                        <button id="btnMenuPrincipal" class="secundario">🏠 Menú Principal</button>
+                    </div>
                 </div>
             </div>
-        </section>
 
-        <!-- CONTROLES TÁCTILES MÓVILES -->
-        <section class="zona-controles-tactiles" id="controlesTactiles">
-            <div class="grupo-movimiento">
-                <button type="button" class="btn-control" data-dir="ArrowLeft">◀</button>
-                <button type="button" class="btn-control" data-dir="ArrowRight">▶</button>
-            </div>
-            <button type="button" class="btn-disparo" id="btnDisparoMovil">⚡ DISPARAR</button>
-        </section>
-
-        <section class="instrucciones">
-            <h3>Controles de Combate</h3>
-            <p>
-                ⌨️ <strong>PC:</strong> Flechas <strong>← / →</strong> para moverte, <strong>Barra Espaciadora</strong> para disparar.<br>
-                📱 <strong>Móvil:</strong> Usa los botones táctiles inferiores para pilotar y disparar. ¡Evita chocar contra los asteroides!
-            </p>
-        </section>
+        </div>
 
         <footer>
-            ✦ Galactic Defender · Arcade Espacial 2D ✦
+            ✦ Galactic Defender · Vistas Funcionales ✦
         </footer>
 
     </main>
 
     <script>
-        const canvas = document.getElementById("juego");
+        // ==========================================
+        // GESTIÓN DE VISTAS (ROUTER SIMPLE)
+        // ==========================================
+        const vistas = {
+            menu: document.getElementById("vistaMenu"),
+            opciones: document.getElementById("vistaOpciones"),
+            juego: document.getElementById("vistaJuego"),
+            gameOver: document.getElementById("vistaGameOver")
+        };
+
+        function cambiarVista(nombreVista) {
+            Object.keys(vistas).forEach(key => {
+                if (key === nombreVista) {
+                    vistas[key].classList.remove("oculta");
+                } else {
+                    vistas[key].classList.add("oculto");
+                    // Asegurar clases de transición limpias
+                    if(key !== nombreVista) vistas[key].classList.add("oculta");
+                }
+            });
+        }
+
+        // ==========================================
+        // LÓGICA DEL JUEGO ARCADE
+        // ==========================================
+        const canvas = document.getElementById("canvasJuego");
         const ctx = canvas.getContext("2d");
 
-        const ancho = 700;
-        const alto = 450;
-
-        const elPuntuacion = document.getElementById("puntuacion");
-        const elVidas = document.getElementById("vidas");
-        const elOleada = document.getElementById("oleada");
-        const pantallaInicio = document.getElementById("pantallaInicio");
-        const pantallaFinal = document.getElementById("pantallaFinal");
-        const statPuntaje = document.getElementById("statPuntaje");
-        const statMeteoritos = document.getElementById("statMeteoritos");
+        const hudPuntos = document.getElementById("hudPuntos");
+        const hudVida = document.getElementById("hudVida");
+        const hudOleada = document.getElementById("hudOleada");
+        const statFinalPuntos = document.getElementById("statFinalPuntos");
+        const statFinalMeteoritos = document.getElementById("statFinalMeteoritos");
 
         let jugando = false;
         let ultimoTiempo = 0;
         let puntuacion = 0;
         let vidas = 100;
         let oleada = 1;
-        let meteoritosDestruidos = 0;
-        let cooldownDisparo = 0;
+        let meteoritosRotos = 0;
+        let cooldown = 0;
 
         const teclas = {};
-        let estrellasFondo = [];
+        let estrellas = [];
         let balas = [];
         let meteoritos = [];
-        let enemigos = [];
         let particulas = [];
 
         const nave = {
-            x: ancho / 2,
-            y: alto - 45,
-            ancho: 40,
-            alto: 32,
-            velocidad: 340
+            x: 350,
+            y: 395,
+            ancho: 38,
+            alto: 30,
+            velocidad: 320
         };
 
-        function crearFondo() {
-            estrellasFondo = [];
-            for (let i = 0; i < 120; i++) {
-                estrellasFondo.push({
-                    x: Math.random() * ancho,
-                    y: Math.random() * alto,
+        function iniciarEntornoJuego() {
+            puntuacion = 0;
+            vidas = 100;
+            oleada = 1;
+            meteoritosRotos = 0;
+            balas = [];
+            meteoritos = [];
+            particulas = [];
+            nave.x = 350;
+
+            estrellas = [];
+            for (let i = 0; i < 90; i++) {
+                estrellas.push({
+                    x: Math.random() * 700,
+                    y: Math.random() * 450,
                     radio: Math.random() * 1.5 + 0.5,
-                    velocidad: Math.random() * 30 + 10
+                    vel: Math.random() * 25 + 10
                 });
             }
+
+            cambiarVista("juego");
+            jugando = true;
+            ultimoTiempo = performance.now();
+            requestAnimationFrame(bucleJuego);
         }
 
-        function generarMeteorito() {
-            const radio = 16 + Math.random() * 22;
-            meteoritos.push({
-                x: Math.random() * (ancho - 60) + 30,
-                y: -50,
-                radio: radio,
-                vx: (Math.random() - 0.5) * 60,
-                vy: Math.random() * 70 + 50 + (oleada * 8),
-                rotacion: Math.random() * Math.PI,
-                vRot: (Math.random() - 0.5) * 3
-            });
+        function disparar() {
+            if (cooldown > 0 || !jugando) return;
+            balas.push({ x: nave.x, y: nave.y - 15, radio: 3.5, vy: -520 });
+            cooldown = 0.2;
         }
 
-        function generarEnemigo() {
-            enemigos.push({
-                x: Math.random() * (ancho - 80) + 40,
-                y: -40,
-                ancho: 34,
-                alto: 26,
-                vx: (Math.random() - 0.5) * 100,
-                vy: 40 + oleada * 5,
-                vida: 2
-            });
-        }
+        function actualizar(delta) {
+            if (cooldown > 0) cooldown -= delta;
 
-        function generarParticulas(x, y, color, cantidad = 10) {
-            for (let i = 0; i < cantidad; i++) {
-                const ang = Math.random() * Math.PI * 2;
-                const vel = 30 + Math.random() * 100;
-                particulas.push({
-                    x, y,
-                    vx: Math.cos(ang) * vel,
-                    vy: Math.sin(ang) * vel,
-                    radio: 1.5 + Math.random() * 2.5,
-                    color,
-                    vida: 1
-                });
-            }
-        }
-
-        function dispararLaser() {
-            if (cooldownDisparo > 0 || !jugando) return;
-            balas.push({
-                x: nave.x,
-                y: nave.y - 18,
-                radio: 4,
-                vy: -550
-            });
-            cooldownDisparo = 0.22;
-        }
-
-        function actualizarJuego(delta) {
-            if (cooldownDisparo > 0) cooldownDisparo -= delta;
-
-            // Movimiento de la nave
             let dir = 0;
             if (teclas["ArrowLeft"] || teclas["a"]) dir--;
             if (teclas["ArrowRight"] || teclas["d"]) dir++;
 
             nave.x += dir * nave.velocidad * delta;
-            nave.x = Math.max(nave.ancho / 2 + 10, Math.min(ancho - nave.ancho / 2 - 10, nave.x));
+            nave.x = Math.max(25, Math.min(675, nave.x));
 
-            // Actualizar estrellas de fondo
-            estrellasFondo.forEach(e => {
-                e.y += e.velocidad * delta;
-                if (e.y > alto) e.y = 0;
+            // Estrellas
+            estrellas.forEach(e => {
+                e.y += e.vel * delta;
+                if (e.y > 450) e.y = 0;
             });
 
-            // Oleadas automáticas según puntuación
-            oleada = Math.floor(puntuacion / 350) + 1;
-            elOleada.textContent = oleada;
+            oleada = Math.floor(puntuacion / 300) + 1;
+            hudOleada.textContent = oleada;
 
-            // Generar meteoritos y enemigos de forma dinámica
-            if (Math.random() < 0.022 + oleada * 0.003 && meteoritos.length < 12) {
-                generarMeteorito();
-            }
-            if (puntuacion > 200 && Math.random() < 0.008 + oleada * 0.002 && enemigos.length < 4) {
-                generarEnemigo();
+            // Generar meteoritos
+            if (Math.random() < 0.025 + oleada * 0.003 && meteoritos.length < 10) {
+                meteoritos.push({
+                    x: Math.random() * 640 + 30,
+                    y: -40,
+                    radio: 14 + Math.random() * 18,
+                    vy: Math.random() * 60 + 50 + oleada * 7,
+                    rot: Math.random() * Math.PI
+                });
             }
 
-            // Mover balas
+            // Balas
             for (let i = balas.length - 1; i >= 0; i--) {
-                const b = balas[i];
-                b.y += b.vy * delta;
-                if (b.y < -10) balas.splice(i, 1);
+                balas[i].y += balas[i].vy * delta;
+                if (balas[i].y < -10) balas.splice(i, 1);
             }
 
-            // Mover meteoritos
+            // Meteoritos
             for (let i = meteoritos.length - 1; i >= 0; i--) {
                 const m = meteoritos[i];
-                m.x += m.vx * delta;
                 m.y += m.vy * delta;
-                m.rotacion += m.vRot * delta;
+                m.rot += 0.02;
 
-                if (m.y > alto + 50) {
+                if (m.y > 480) {
                     meteoritos.splice(i, 1);
                     continue;
                 }
 
-                // Colisión nave con meteorito
-                if (Math.hypot(nave.x - m.x, nave.y - m.y) < nave.ancho / 2 + m.radio * 0.75) {
+                // Colisión nave-meteorito
+                if (Math.hypot(nave.x - m.x, nave.y - m.y) < nave.ancho / 2 + m.radio * 0.7) {
                     vidas -= 25;
-                    generarParticulas(m.x, m.y, "#FF88B2", 15);
                     meteoritos.splice(i, 1);
-                    if (vidas <= 0) terminarJuego();
+                    if (vidas <= 0) {
+                        jugando = false;
+                        statFinalPuntos.textContent = puntuacion;
+                        statFinalMeteoritos.textContent = meteoritosRotos;
+                        cambiarVista("gameOver");
+                    }
                 }
 
-                // Colisión bala con meteorito
+                // Colisión bala-meteorito
                 for (let j = balas.length - 1; j >= 0; j--) {
                     const b = balas[j];
                     if (Math.hypot(b.x - m.x, b.y - m.y) < m.radio) {
-                        generarParticulas(m.x, m.y, "#C9BEDD", 10);
                         meteoritos.splice(i, 1);
                         balas.splice(j, 1);
-                        puntuacion += 25;
-                        meteoritosDestruidos++;
+                        puntuacion += 20;
+                        meteoritosRotos++;
                         break;
                     }
                 }
             }
 
-            // Mover enemigos
-            for (let i = enemigos.length - 1; i >= 0; i--) {
-                const en = enemigos[i];
-                en.x += en.vx * delta;
-                en.y += en.vy * delta;
-
-                if (en.x < 30 || en.x > ancho - 30) en.vx *= -1;
-                if (en.y > alto + 40) {
-                    enemigos.splice(i, 1);
-                    continue;
-                }
-
-                // Colisión nave con enemigo
-                if (Math.abs(nave.x - en.x) < 25 && Math.abs(nave.y - en.y) < 20) {
-                    vidas -= 35;
-                    generarParticulas(en.x, en.y, "#FF88B2", 20);
-                    enemigos.splice(i, 1);
-                    if (vidas <= 0) terminarJuego();
-                }
-
-                // Colisión bala con enemigo
-                for (let j = balas.length - 1; j >= 0; j--) {
-                    const b = balas[j];
-                    if (Math.abs(b.x - en.x) < en.ancho / 2 && Math.abs(b.y - en.y) < en.alto / 2) {
-                        en.vida--;
-                        balas.splice(j, 1);
-                        generarParticulas(b.x, b.y, "#88C0FF", 8);
-                        if (en.vida <= 0) {
-                            generarParticulas(en.x, en.y, "#FFD27F", 18);
-                            enemigos.splice(i, 1);
-                            puntuacion += 60;
-                        }
-                        break;
-                    }
-                }
-            }
-
-            // Actualizar partículas
-            for (let i = particulas.length - 1; i >= 0; i--) {
-                const p = particulas[i];
-                p.x += p.vx * delta;
-                p.y += p.vy * delta;
-                p.vida -= delta * 2;
-                if (p.vida <= 0) particulas.splice(i, 1);
-            }
-
-            elPuntuacion.textContent = puntuacion;
-            elVidas.textContent = Math.max(0, vidas) + "%";
+            hudPuntos.textContent = puntuacion;
+            hudVida.textContent = Math.max(0, vidas) + "%";
         }
 
-        function dibujarEscena() {
+        function renderizar() {
             ctx.fillStyle = "#080512";
-            ctx.fillRect(0, 0, ancho, alto);
+            ctx.fillRect(0, 0, 700, 450);
 
-            // Dibujar estrellas
-            estrellasFondo.forEach(e => {
+            // Fondo estelar
+            estrellas.forEach(e => {
                 ctx.fillStyle = "#FFF";
-                ctx.globalAlpha = 0.5 + Math.sin(e.y) * 0.5;
                 ctx.beginPath();
                 ctx.arc(e.x, e.y, e.radio, 0, Math.PI * 2);
                 ctx.fill();
             });
-            ctx.globalAlpha = 1;
 
-            // Dibujar balas
+            // Balas
             balas.forEach(b => {
                 ctx.fillStyle = "#88C0FF";
-                ctx.shadowColor = "#88C0FF";
-                ctx.shadowBlur = 8;
                 ctx.beginPath();
                 ctx.arc(b.x, b.y, b.radio, 0, Math.PI * 2);
                 ctx.fill();
             });
-            ctx.shadowBlur = 0;
 
-            // Dibujar meteoritos
+            // Meteoritos
             meteoritos.forEach(m => {
                 ctx.save();
                 ctx.translate(m.x, m.y);
-                ctx.rotate(m.rotacion);
+                ctx.rotate(m.rot);
                 ctx.fillStyle = "#554466";
                 ctx.strokeStyle = "#887899";
                 ctx.lineWidth = 2;
@@ -620,105 +549,46 @@
                 ctx.restore();
             });
 
-            // Dibujar enemigos
-            enemigos.forEach(en => {
-                ctx.save();
-                ctx.translate(en.x, en.y);
-                ctx.fillStyle = "#FF5588";
-                ctx.shadowColor = "#FF5588";
-                ctx.shadowBlur = 10;
-                ctx.beginPath();
-                ctx.moveTo(0, 14);
-                ctx.lineTo(-18, -12);
-                ctx.lineTo(0, -6);
-                ctx.lineTo(18, -12);
-                ctx.closePath();
-                ctx.fill();
-                ctx.restore();
-            });
-            ctx.shadowBlur = 0;
-
-            // Dibujar nave del jugador
+            // Nave
             ctx.save();
             ctx.translate(nave.x, nave.y);
             ctx.fillStyle = "#A888FF";
-            ctx.shadowColor = "#A888FF";
-            ctx.shadowBlur = 12;
             ctx.beginPath();
-            ctx.moveTo(0, -18);
-            ctx.lineTo(-20, 16);
-            ctx.lineTo(0, 8);
-            ctx.lineTo(20, 16);
-            ctx.closePath();
-            ctx.fill();
-
-            // Propulsor trasero
-            ctx.fillStyle = "#FFD27F";
-            ctx.beginPath();
-            ctx.moveTo(-6, 8);
-            ctx.lineTo(0, 20 + Math.random() * 8);
-            ctx.lineTo(6, 8);
+            ctx.moveTo(0, -16);
+            ctx.lineTo(-18, 14);
+            ctx.lineTo(0, 6);
+            ctx.lineTo(18, 14);
             ctx.closePath();
             ctx.fill();
             ctx.restore();
-            ctx.shadowBlur = 0;
-
-            // Partículas
-            particulas.forEach(p => {
-                ctx.globalAlpha = Math.max(0, p.vida);
-                ctx.fillStyle = p.color;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.radio, 0, Math.PI * 2);
-                ctx.fill();
-            });
-            ctx.globalAlpha = 1;
         }
 
-        function bucle(tiempoActual) {
+        function bucleJuego(t) {
             if (!jugando) return;
-            const delta = Math.min((tiempoActual - ultimoTiempo) / 1000, 0.033);
-            ultimoTiempo = tiempoActual;
+            const delta = Math.min((t - ultimoTiempo) / 1000, 0.033);
+            ultimoTiempo = t;
 
-            actualizarJuego(delta);
+            actualizar(delta);
             if (!jugando) return;
-            dibujarEscena();
+            renderizar();
 
-            requestAnimationFrame(bucle);
+            requestAnimationFrame(bucleJuego);
         }
 
-        function iniciarJuego() {
-            puntuacion = 0;
-            vidas = 100;
-            oleada = 1;
-            meteoritosDestruidos = 0;
-            balas = [];
-            meteoritos = [];
-            enemigos = [];
-            particulas = [];
-            nave.x = ancho / 2;
-
-            crearFondo();
-
-            pantallaInicio.classList.add("oculto");
-            pantallaFinal.classList.add("oculto");
-
-            jugando = true;
-            ultimoTiempo = performance.now();
-            requestAnimationFrame(bucle);
-        }
-
-        function terminarJuego() {
-            jugando = false;
-            statPuntaje.textContent = puntuacion;
-            statMeteoritos.textContent = meteoritosDestruidos;
-            pantallaFinal.classList.remove("oculto");
-        }
+        // ==========================================
+        // ASOCIACIÓN DE EVENTOS Y BOTONES DE VISTA
+        // ==========================================
+        document.getElementById("btnIrJuego").addEventListener("click", iniciarEntornoJuego);
+        document.getElementById("btnIrOpciones").addEventListener("click", () => cambiarVista("opciones"));
+        document.getElementById("btnVolverMenu").addEventListener("click", () => cambiarVista("menu"));
+        document.getElementById("btnReintentar").addEventListener("click", iniciarEntornoJuego);
+        document.getElementById("btnMenuPrincipal").addEventListener("click", () => cambiarVista("menu"));
 
         // Controles de teclado
         window.addEventListener("keydown", e => {
             const k = e.key;
-            if (["ArrowLeft", "ArrowRight", " "].includes(k) && jugando) e.preventDefault();
-            if (k === " " && jugando) dispararLaser();
+            if (["ArrowLeft", "ArrowRight", " "].includes(k) && !vistas.juego.classList.contains("oculta")) e.preventDefault();
+            if (k === " " && !vistas.juego.classList.contains("oculta")) disparar();
             teclas[k] = true;
             teclas[k.toLowerCase()] = true;
         });
@@ -728,8 +598,8 @@
             teclas[e.key.toLowerCase()] = false;
         });
 
-        // Controles Táctiles y de Botones
-        document.querySelectorAll("[data-dir]").forEach(el => {
+        // Controles táctiles de la vista activa de juego
+        document.querySelectorAll(".vistas-contenedor [data-dir], .zona-controles-tactiles [data-dir]").forEach(el => {
             const dir = el.getAttribute("data-dir");
             const act = e => { if(e.cancelable) e.preventDefault(); teclas[dir] = true; el.classList.add("presionado"); };
             const des = e => { if(e.cancelable) e.preventDefault(); teclas[dir] = false; el.classList.remove("presionado"); };
@@ -740,12 +610,5 @@
         });
 
         const btnDisparoMovil = document.getElementById("btnDisparoMovil");
-        btnDisparoMovil.addEventListener("pointerdown", e => {
-            if(e.cancelable) e.preventDefault();
-            dispararLaser();
-            btnDisparoMovil.classList.add("presionado");
-        });
-        btnDisparoMovil.addEventListener("pointerup", () => btnDisparoMovil.classList.remove("presionado"));
-        btnDisparoMovil.addEventListener("touchstart", e => {
-            if(e.cancelable) e.preventDefault();
-            dispararLaser
+        btnDisparoMovil.addEventListener("pointerdown", e => { if(e.cancelable) e.preventDefault(); disparar(); btnDisparoMovil.classList.add("presionado"); });
+        btn
