@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nebula Agar - Supervivencia Orbital</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #211D38;
+            color: #F8F3FF;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 25px 12px;
+        }
+
+        .contenedor {
+            max-width: 850px;
+            margin: auto;
+        }
+
+        .etiqueta {
+            color: #E7A9CF;
+            font-size: 12px;
+            letter-spacing: 3px;
+            font-weight: bold;
+        }
+
+        h1 {
+            font-size: 46px;
+            margin: 12px 0;
+            letter-spacing: 2px;
+        }
+
+        h1 span {
+            color: #B69AE8;
+        }
+
+        .subtitulo {
+            color: #C9BEDD;
+            margin-bottom: 22px;
+        }
+
+        .panel {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .dato {
+            background: #30294C;
+            border: 1px solid #66538D;
+            border-radius: 12px;
+            padding: 12px 22px;
+            min-width: 145px;
+        }
+
+        .dato small {
+            display: block;
+            color: #C9BEDD;
+            font-size: 11px;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+
+        .dato strong {
+            color: #F7D98B;
+            font-size: 22px;
+        }
+
+        .zona-juego {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: #171329;
+            border: 3px solid #9B83D5;
+            border-radius: 15px;
+            box-shadow: 0 0 25px rgba(155, 131, 213, 0.25);
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            cursor: crosshair;
+        }
+
+        .pantalla {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(20, 16, 39, 0.88);
+            border-radius: 15px;
+            padding: 15px;
+            z-index: 10;
+            backdrop-filter: blur(3px);
+        }
+
+        .oculto {
+            display: none !important;
+        }
+
+        .tarjeta {
+            background: #30294C;
+            border: 2px solid #9B83D5;
+            border-radius: 18px;
+            padding: 28px;
+            max-width: 400px;
+            width: 100%;
+            user-select: none;
+            -webkit-user-select: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+        }
+
+        .tarjeta h2 {
+            color: #D9C7FF;
+            margin-bottom: 12px;
+        }
+
+        .tarjeta p {
+            color: #E3DCEC;
+            line-height: 1.55;
+            margin-bottom: 18px;
+            font-size: 14px;
+        }
+
+        .decoracion {
+            color: #F7D98B;
+            font-size: 25px;
+            margin-bottom: 10px;
+        }
+
+        .input-nombre {
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 18px;
+            border-radius: 12px;
+            border: 2px solid #66538D;
+            background: #171329;
+            color: #F8F3FF;
+            font-size: 15px;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-nombre:focus {
+            border-color: #F7D98B;
+        }
+
+        .input-nombre::placeholder {
+            color: #9588AD;
+        }
+
+        .resumen-stats {
+            background: #211D38;
+            border: 1px solid #66538D;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-around;
+            gap: 10px;
+        }
+
+        .resumen-stats div small {
+            display: block;
+            font-size: 11px;
+            color: #C9BEDD;
+            margin-bottom: 4px;
+        }
+
+        .resumen-stats div strong {
+            color: #F7D98B;
+            font-size: 18px;
+        }
+
+        button {
+            background: #9B83D5;
+            color: #211D38;
+            border: none;
+            border-radius: 25px;
+            padding: 13px 28px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        button:hover {
+            background: #C5A9F5;
+            transform: scale(1.04);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* CONTROLES TÁCTILES MÓVILES Y ACCIÓN */
+        .zona-controles-tactiles {
+            margin-top: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        .fila-controles-movil {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .pad-direccional {
+            display: grid;
+            grid-template-columns: repeat(3, 62px);
+            grid-template-rows: repeat(3, 62px);
+            gap: 7px;
+            justify-content: center;
+            align-items: center;
+            background: #282142;
+            padding: 11px;
+            border-radius: 24px;
+            border: 2px solid #66538D;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.4);
+            touch-action: none;
+        }
+
+        .btn-control {
+            width: 62px;
+            height: 62px;
+            border-radius: 16px;
+            background: #393059;
+            border: 2px solid #9B83D5;
+            color: #F7D98B;
+            font-size: 22px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: none;
+            transition: background 0.1s, transform 0.08s, box-shadow 0.08s;
+            box-shadow: 0 4px 0 #1b162f;
+            padding: 0;
+            outline: none;
+        }
+
+        .btn-control:hover {
+            background: #4b3e77;
+        }
+
+        .btn-control:active,
+        .btn-control.presionado {
+            background: #9B83D5 !important;
+            color: #211D38 !important;
+            transform: translateY(3px) !important;
+            box-shadow: 0 1px 0 #1b162f !important;
+        }
+
+        .btn-arriba { grid-column: 2; grid-row: 1; }
+        .btn-izq { grid-column: 1; grid-row: 2; }
+        .centro-pad {
+            grid-column: 2;
+            grid-row: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            user-select: none;
+            pointer-events: none;
+        }
+        .btn-der { grid-column: 3; grid-row: 2; }
+        .btn-abajo { grid-column: 2; grid-row: 3; }
+
+        .btn-impulso {
+            width: 115px;
+            height: 115px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #3c2f61, #282142);
+            border: 3px solid #F7D98B;
+            color: #F7D98B;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            font-weight: bold;
+            box-shadow: 0 6px 0 #1b162f, 0 0 18px rgba(247, 217, 139, 0.25);
+            touch-action: none;
+            padding: 0;
+        }
+
+        .btn-impulso span.icono-rayo {
+            font-size: 28px;
+            line-height: 1;
+        }
+
+        .btn-impulso:hover {
+            background: linear-gradient(145deg, #4d3c7a, #322952);
+            transform: scale(1.03);
+        }
+
+        .btn-impulso:active,
+        .btn-impulso.presionado {
+            background: #F7D98B !important;
+            color: #211D38 !important;
+            transform: translateY(4px) scale(0.98) !important;
+            box-shadow: 0 2px 0 #1b162f !important;
+        }
+
+        .ayuda-tactil {
+            color: #C9BEDD;
+            font-size: 13px;
+            max-width: 520px;
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        .instrucciones {
+            background: #30294C;
+            border: 1px solid #66538D;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .instrucciones h3 {
+            color: #D9C7FF;
+            margin-bottom: 13px;
+        }
+
+        .controles {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .controles span {
+            background: #211D38;
+            border: 1px solid #9B83D5;
+            padding: 9px 14px;
+            border-radius: 8px;
+            color: #F7D98B;
+            font-size: 13px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            transition: 0.1s;
+        }
+
+        .controles span:active,
+        .controles span.presionado {
+            background: #9B83D5;
+            color: #211D38;
+            transform: scale(0.97);
+        }
+
+        .instrucciones p {
+            color: #C9BEDD;
+            font-size: 13px;
+            margin-top: 14px;
+            line-height: 1.6;
+        }
+
+        footer {
+            color: #9588AD;
+            font-size: 12px;
+            margin-top: 22px;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 14px 8px; }
+            h1 { font-size: 34px; margin: 8px 0; }
+            .subtitulo { font-size: 13px; margin-bottom: 14px; }
+            .panel { gap: 8px; margin-bottom: 12px; }
+            .dato { min-width: 98px; padding: 8px 10px; }
+            .dato strong { font-size: 17px; }
+            .tarjeta { padding: 20px 16px; }
+            .tarjeta h2 { font-size: 20px; }
+            .fila-controles-movil { gap: 16px; }
+            .pad-direccional {
+                grid-template-columns: repeat(3, 54px);
+                grid-template-rows: repeat(3, 54px);
+                gap: 6px;
+                padding: 9px;
+            }
+            .btn-control { width: 54px; height: 54px; font-size: 20px; }
+            .btn-impulso { width: 96px; height: 96px; font-size: 12px; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="contenedor">
+
+        <header>
+            <span class="etiqueta">✦ SUPERVIVENCIA ORBITAL 2D ✦</span>
+            <h1>Nebula <span>Agar</span></h1>
+            <p class="subtitulo">
+                Absorbe polvo estelar, devora planetas más pequeños y domina la galaxia.
+            </p>
+        </header>
+
+        <section class="panel">
+            <div class="dato">
+                <small>⭐ MASA / PUNTOS</small>
+                <strong id="puntuacion">25</strong>
+            </div>
+
+            <div class="dato">
+                <small>🏆 POSICIÓN</small>
+                <strong id="posicion">#12 / 12</strong>
+            </div>
+
+            <div class="dato">
+                <small>☄️ RANGO</small>
+                <strong id="rango">Asteroide</strong>
+            </div>
+        </section>
+
+        <section class="zona-juego">
+
+            <canvas id="juego" width="800" height="500">
+                Tu navegador no admite Canvas.
+            </canvas>
+
+            <!-- PANTALLA DE INICIO -->
+            <div id="pantallaInicio" class="pantalla">
+                <div class="tarjeta">
+                    <div class="decoracion">✧ ✦ ✧</div>
+                    <h2>Bienvenida a Nebula Agar</h2>
+                    <p>
+                        Absorbe estrellas y cuerpos celestes menores que tú.
+                        Evita los planetas gigantes y usa los agujeros negros para cubrirte.
+                    </p>
+                    <input type="text" id="inputNombre" class="input-nombre" maxlength="14" placeholder="Nombre de tu planeta (Ej. Luna)">
+                    <button id="btnIniciar">Comenzar órbita</button>
+                </div>
+            </div>
+
+            <!-- PANTALLA DE GAME OVER / VICTORIA -->
+            <div id="pantallaFinal" class="pantalla oculto">
+                <div class="tarjeta">
+                    <div class="decoracion">✦ ✧ ✦</div>
+                    <h2 id="mensajeFinal">¡Órbita colapsada!</h2>
+                    <p id="resultadoFinal"></p>
+                    <div class="resumen-stats">
+                        <div>
+                            <small>⭐ MASA MÁXIMA</small>
+                            <strong id="statMasaMax">0</strong>
+                        </div>
+                        <div>
+                            <small>🪐 ABSORBIDOS</small>
+                            <strong id="statAbsorbidos">0</strong>
+                        </div>
+                    </div>
+                    <button id="btnReiniciar">Volver a jugar</button>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- CONTROLES TÁCTILES PARA CELULAR / MÓVIL -->
+        <section class="zona-controles-tactiles" id="controlesTactiles" aria-label="Controles táctiles">
+            <div class="fila-controles-movil">
+                <div class="pad-direccional">
+                    <button type="button" class="btn-control btn-arriba" data-dir="ArrowUp" aria-label="Arriba">▲</button>
+                    <button type="button" class="btn-control btn-izq" data-dir="ArrowLeft" aria-label="Izquierda">◀</button>
+                    <div class="centro-pad">🪐</div>
+                    <button type="button" class="btn-control btn-der" data-dir="ArrowRight" aria-label="Derecha">▶</button>
+                    <button type="button" class="btn-control btn-abajo" data-dir="ArrowDown" aria-label="Abajo">▼</button>
+                </div>
+
+                <button type="button" class="btn-impulso" id="btnImpulso" aria-label="Impulso estelar">
+                    <span class="icono-rayo">⚡</span>
+                    <span>IMPULSO</span>
+                </button>
+            </div>
+            <p class="ayuda-tactil">
+                📱 <strong>En celular o mouse:</strong> Mueve el cursor/dedo sobre el espacio o usa la cruceta. Pulsa <strong>⚡ Impulso</strong> para acelerar soltando masa.
+            </p>
+        </section>
+
+        <section class="instrucciones">
+            <h3>Reglas y Controles Orbitales</h3>
+            <div class="controles">
+                <span data-dir="ArrowUp">↑ Arriba (W)</span>
+                <span data-dir="ArrowDown">↓ Abajo (S)</span>
+                <span data-dir="ArrowLeft">← Izquierda (A)</span>
+                <span data-dir="ArrowRight">→ Derecha (D)</span>
+                <span id="teclaEspacio">⚡ Espacio (Impulso)</span>
+            </div>
+            <p>
+                🪐 <strong>Absorción:</strong> Solo puedes absorber objetivos al menos un <strong>12% más pequeños</strong> que tú.<br>
+                🌀 <strong>Agujeros Negros:</strong> Refugio seguro si eres pequeño, pero reducen un 30% la masa de planetas gigantes.<br>
+                🏆 <strong>Objetivo:</strong> Alcanza <strong>1,500 de masa</strong> para convertirte en Supernova y conquistar el sector.
+            </p>
+        </section>
+
+        <footer>
+            ✦ Nebula Agar · Supervivencia Orbital 2D ✦
+        </footer>
+
+    </main>
+
+    <script>
+        // ========================================
+        // 1. CONFIGURACIÓN DEL CANVAS Y EL MUNDO
+        // ========================================
+
+        const canvas = document.getElementById("juego");
+        const ctx = canvas.getContext("2d");
+
+        const anchoVista = canvas.width;   // 800
+        const altoVista = canvas.height;   // 500
+
+        // Dimensiones del universo expandido
+        const MUNDO_ANCHO = 2400;
+        const MUNDO_ALTO = 2400;
+
+        // Elementos de la interfaz
+        const elPuntuacion = document.getElementById("puntuacion");
+        const elPosicion = document.getElementById("posicion");
+        const elRango = document.getElementById("rango");
+
+        const pantallaInicio = document.getElementById("pantallaInicio");
+        const pantallaFinal = document.getElementById("pantallaFinal");
+        const inputNombre = document.getElementById("inputNombre");
+
+        const mensajeFinal = document.getElementById("mensajeFinal");
+        const resultadoFinal = document.getElementById("resultadoFinal");
+        const statMasaMax = document.getElementById("statMasaMax");
+        const statAbsorbidos = document.getElementById("statAbsorbidos");
+
+        // ========================================
+        // 2. VARIABLES GENERALES Y ESTADO
+        // ========================================
+
+        let jugando = false;
+        let ultimoTiempo = 0;
+
+        let comida = [];
+        let masaEyectada = [];
+        let bots = [];
+        let agujerosNegros = [];
+        let particulas = [];
+        let estrellasFondo = [];
+
+        const teclas = {};
+        let punteroActivo = false;
+        let punteroPantalla = { x: anchoVista / 2, y: altoVista / 2 };
+
+        // Cámara suave con zoom dinámico
+        const camara = {
+            x: MUNDO_ANCHO / 2,
+            y: MUNDO_ALTO / 2,
+            zoom: 1
+        };
+
+        // Nombres y paletas espaciales para bots
+        const NOMBRES_BOTS = [
+            "Andrómeda", "Vega", "Sirius", "Orión", "Nova",
+            "Titán", "Lyra", "Cassiopeia", "Altair", "Polaris", "Fénix"
+        ];
+
+        const PALETAS_PLANETAS = [
+            { base: "#E7A9CF", borde: "#F8D1E8", anillo: true },
+            { base: "#91C9D8", borde: "#C7EDF7", anillo: false },
+            { base: "#F7D98B", borde: "#FFF0C2", anillo: true },
+            { base: "#A3E4B7", borde: "#D4F7DF", anillo: false },
+            { base: "#F29F80", borde: "#FFD1C0", anillo: false },
+            { base: "#8FA8FF", borde: "#C7D4FF", anillo: true },
+            { base: "#D896FF", borde: "#EED1FF", anillo: false }
+        ];
+
+        // ========================================
+        // 3. UTILIDADES MATEMÁTICAS DE MASA/RADIO
+        // ========================================
+
+        // La masa es proporcional al área (radio^2 / 15) para un crecimiento equilibrado
+        function masaARadio(masa) {
+            return Math.sqrt(masa * 15);
+        }
+
+        function radioAMasa(radio) {
+            return (radio * radio) / 15;
+        }
+
+        function obtenerRangoPorMasa(masa) {
+            if (masa < 60) return "Asteroide";
+            if (masa < 150) return "Luna";
+            if (masa < 320) return "Planeta";
+            if (masa < 650) return "Gigante";
+            if (masa < 1100) return "Estrella";
+            return "Supernova";
+        }
+
+        // ========================================
+        // 4. JUGADOR PRINCIPAL
+        // ========================================
+
+        const jugador = {
+            nombre: "Luna",
+            x: MUNDO_ANCHO / 2,
+            y: MUNDO_ALTO / 2,
+            masa: 28,
+            radio: masaARadio(28),
+            vx: 0,
+            vy: 0,
+            impulsoTimer: 0,
+            cooldownImpulso: 0,
+            colorBase: "#B69AE8",
+            colorBorde: "#E3D4FF",
+            anillo: true,
+            masaMaxima: 28,
+            absorbidos: 0,
+            esJugador: true
+        };
+
+        // ========================================
+        // 5. GENERACIÓN DE ENTIDADES DEL UNIVERSO
+        // ========================================
+
+        function crearFondoEstelar() {
+            estrellasFondo = [];
+            for (let i = 0; i < 220; i++) {
+                estrellasFondo.push({
+                    x: Math.random() * MUNDO_ANCHO,
+                    y: Math.random() * MUNDO_ALTO,
+                    radio: Math.random() * 2 + 0.5,
+                    brillo: Math.random(),
+                    paralaje: 0.75 + Math.random() * 0.25
+                });
+            }
+        }
+
+        function crearOrbeComida(x, y) {
+            const coloresComida = ["#F7D98B", "#E7A9CF", "#B69AE8", "#91C9D8", "#A3E4B7"];
+            const esEstrella = Math.random() < 0.16;
+            return {
+                x: x ?? Math.random() * (MUNDO_ANCHO - 60) + 30,
+                y: y ?? Math.random() * (MUNDO_ALTO - 60) + 30,
+                masa: esEstrella ? 4 : 1.5,
+                radio: esEstrella ? 8 : 5,
+                color: esEstrella ? "#F7D98B" : coloresComida[Math.floor(Math.random() * coloresComida.length)],
+                esEstrella: esEstrella,
+                pulso: Math.random() * Math.PI * 2
+            };
+        }
+
+        function crearBot(indice) {
+            const paleta = PALETAS_PLANETAS[indice % PALETAS_PLANETAS.length];
+            const masaInicial = 22 + Math.random() * 55;
+            let bx, by;
+
+            // Evitar aparecer encima del jugador
+            do {
+                bx = Math.random() * (MUNDO_ANCHO - 200) + 100;
+                by = Math.random() * (MUNDO_ALTO - 200) + 100;
+            } while (Math.hypot(bx - jugador.x, by - jugador.y) < 350);
+
+            return {
+                nombre: NOMBRES_BOTS[indice % NOMBRES_BOTS.length],
+                x: bx,
+                y: by,
+                masa: masaInicial,
+                radio: masaARadio(masaInicial),
+                vx: 0,
+                vy: 0,
+                anguloErrante: Math.random() * Math.PI * 2,
+                tiempoCambioRumbo: Math.random() * 2,
+                colorBase: paleta.base,
+                colorBorde: paleta.borde,
+                anillo: paleta.anillo,
+                esJugador: false
+            };
+        }
+
+        function crearAgujeroNegro() {
+            let ax, ay;
+            do {
+                ax = Math.random() * (MUNDO_ANCHO - 300) + 150;
+                ay = Math.random() * (MUNDO_ALTO - 300) + 150;
+            } while (Math.hypot(ax - jugador.x, ay - jugador.y) < 300);
+
+            return {
+                x: ax,
+                y: ay,
+                radio: 42,
+                rotacion: Math.random() * Math.PI * 2
+            };
+        }
+
+        function generarParticulas(x, y, color, cantidad = 10) {
+            for (let i = 0; i < cantidad; i++) {
+                const angulo = Math.random() * Math.PI * 2;
+                const vel = 40 + Math.random() * 140;
+                particulas.push({
+                    x,
+                    y,
+                    vx: Math.cos(angulo) * vel,
+                    vy: Math.sin(angulo) * vel,
+                    radio: 2 + Math.random() * 3.5,
+                    color,
+                    vida: 1
+                });
+            }
+        }
+
+        // ========================================
+        // 6. MECÁNICA DE IMPULSO ESTELAR (ESPACIO)
+        // ========================================
+
+        function activarImpulso() {
+            if (!jugando) return;
+            if (jugador.cooldownImpulso > 0 || jugador.masa < 35) return;
+
+            // Costo de masa por usar el impulso
+            const masaGastada = Math.max(4, jugador.masa * 0.08);
+            jugador.masa -= masaGastada;
+            jugador.radio = masaARadio(jugador.masa);
+            jugador.impulsoTimer = 0.28;
+            jugador.cooldownImpulso = 0.85;
+
+            // Determinar dirección actual del movimiento para expulsar masa hacia atrás
+            let dirX = Math.cos(Math.atan2(jugador.vy, jugador.vx));
+            let dirY = Math.sin(Math.atan2(jugador.vy, jugador.vx));
+            if (Math.hypot(jugador.vx, jugador.vy) < 5) {
+                dirX = 0;
+                dirY = -1;
+            }
+
+            // Orbe de masa expulsado hacia atrás
+            masaEyectada.push({
+                x: jugador.x - dirX * (jugador.radio + 8),
+                y: jugador.y - dirY * (jugador.radio + 8),
+                vx: -dirX * 360,
+                vy: -dirY * 360,
+                masa: masaGastada * 0.85,
+                radio: masaARadio(masaGastada * 0.85),
+                color: "#F7D98B",
+                tiempoGracia: 0.4
+            });
+
+            generarParticulas(
+                jugador.x - dirX * jugador.radio,
+                jugador.y - dirY * jugador.radio,
+                "#F7D98B",
+                12
+            );
+        }
+
+        // ========================================
+        // 7. MOVIMIENTO DEL JUGADOR Y CÁMARA
+        // ========================================
+
+        function calcularVelocidadBase(masa) {
+            // Fórmula equilibrada tipo Agar.io: más masa = menor velocidad máxima
+            return Math.max(105, 290 * Math.pow(masa / 25, -0.22));
+        }
+
+        function moverJugador(delta) {
+            if (jugador.impulsoTimer > 0) jugador.impulsoTimer -= delta;
+            if (jugador.cooldownImpulso > 0) jugador.cooldownImpulso -= delta;
+
+            let dirX = 0;
+            let dirY = 0;
+
+            // 1. Entrada por teclado o cruceta táctil
+            if (teclas["ArrowLeft"] || teclas["a"]) dirX--;
+            if (teclas["ArrowRight"] || teclas["d"]) dirX++;
+            if (teclas["ArrowUp"] || teclas["w"]) dirY--;
+            if (teclas["ArrowDown"] || teclas["s"]) dirY++;
+
+            if (dirX !== 0 || dirY !== 0) {
+                const mag = Math.hypot(dirX, dirY);
+                dirX /= mag;
+                dirY /= mag;
+            } else if (punteroActivo) {
+                // 2. Entrada directa hacia el puntero / dedo en el canvas
+                const centroX = anchoVista / 2;
+                const centroY = altoVista / 2;
+                const dx = punteroPantalla.x - centroX;
+                const dy = punteroPantalla.y - centroY;
+                const dist = Math.hypot(dx, dy);
+
+                if (dist > 12) {
+                    const factor = Math.min(1, dist / 90);
+                    dirX = (dx / dist) * factor;
+                    dirY = (dy / dist) * factor;
+                }
+            }
+
+            let velMax = calcularVelocidadBase(jugador.masa);
+            if (jugador.impulsoTimer > 0) {
+                velMax *= 1.85;
+            }
+
+            const objetivoVx = dirX * velMax;
+            const objetivoVy = dirY * velMax;
+
+            // Inercia orbital suave
+            const suavizado = Math.min(1, delta * 7.5);
+            jugador.vx += (objetivoVx - jugador.vx) * suavizado;
+            jugador.vy += (objetivoVy - jugador.vy) * suavizado;
+
+            jugador.x += jugador.vx * delta;
+            jugador.y += jugador.vy * delta;
+
+            // Limitar dentro de las fronteras del universo
+            jugador.x = Math.max(jugador.radio, Math.min(MUNDO_ANCHO - jugador.radio, jugador.x));
+            jugador.y = Math.max(jugador.radio, Math.min(MUNDO_ALTO - jugador.radio, jugador.y));
+
+            // Actualizar cámara suave y zoom progresivo
+            const zoomObjetivo = Math.max(0.45, Math.min(1.05, Math.pow(28 / jugador.masa, 0.24)));
+            camara.zoom += (zoomObjetivo - camara.zoom) * Math.min(1, delta * 3.5);
+            camara.x += (jugador.x - camara.x) * Math.min(1, delta * 8);
+            camara.y += (jugador.y - camara.y) * Math.min(1, delta * 8);
+        }
+
+        // ========================================
+        // 8. INTELIGENCIA ARTIFICIAL DE LOS BOTS
+        // ========================================
+
+        function moverBots(delta) {
+            const todasCelulas = [jugador, ...bots];
+
+            bots.forEach(bot => {
+                bot.tiempoCambioRumbo -= delta;
+
+                let amenazaCercana = null;
+                let distAmenaza = Infinity;
+                let presaCercana = null;
+                let distPresa = Infinity;
+
+                const radioVision = bot.radio * 5.5 + 180;
+
+                // Evaluar amenazas y presas
+                for (const otro of todasCelulas) {
+                    if (otro === bot) continue;
+                    const dist = Math.hypot(otro.x - bot.x, otro.y - bot.y);
+                    if (dist > radioVision) continue;
+
+                    // Si el otro es al menos 12% más grande, es una amenaza
+                    if (otro.radio > bot.radio * 1.12 && dist < distAmenaza) {
+                        distAmenaza = dist;
+                        amenazaCercana = otro;
+                    }
+                    // Si el bot es al menos 12% más grande, es una presa
+                    else if (bot.radio > otro.radio * 1.12 && dist < distPresa) {
+                        distPresa = dist;
+                        presaCercana = otro;
+                    }
+                }
+
+                let dirX = 0;
+                let dirY = 0;
+
+                if (amenazaCercana) {
+                    // Huir en dirección opuesta a la amenaza
+                    dirX = bot.x - amenazaCercana.x;
+                    dirY = bot.y - amenazaCercana.y;
+                } else if (presaCercana) {
+                    // Perseguir a la presa
+                    dirX = presaCercana.x - bot.x;
+                    dirY = presaCercana.y - bot.y;
+                } else {
+                    // Buscar comida cercana
+                    let comidaCercana = null;
+                    let distComida = 260;
+
+                    for (let i = 0; i < comida.length; i += 2) {
+                        const c = comida[i];
+                        const d = Math.hypot(c.x - bot.x, c.y - bot.y);
+                        if (d < distComida) {
+                            distComida = d;
+                            comidaCercana = c;
+                        }
+                    }
+
+                    if (comidaCercana) {
+                        dirX = comidaCercana.x - bot.x;
+                        dirY = comidaCercana.y - bot.y;
+                    } else {
+                        // Explorar el universo
+                        if (bot.tiempoCambioRumbo <= 0) {
+                            bot.anguloErrante += (Math.random() - 0.5) * 2.2;
+                            bot.tiempoCambioRumbo = 1.5 + Math.random() * 2;
+                        }
+                        dirX = Math.cos(bot.anguloErrante);
+                        dirY = Math.sin(bot.anguloErrante);
+                    }
+                }
+
+                // Evitar bordes del mapa
+                const margenBorde = 120;
+                if (bot.x < margenBorde) dirX += 1.5;
+                if (bot.x > MUNDO_ANCHO - margenBorde) dirX -= 1.5;
+                if (bot.y < margenBorde) dirY += 1.5;
+                if (bot.y > MUNDO_ALTO - margenBorde) dirY -= 1.5;
+
+                // Evitar agujeros negros si el bot es grande
+                if (bot.radio > 46) {
+                    for (const an of agujerosNegros) {
+                        const distAn = Math.hypot(bot.x - an.x, bot.y - an.y);
+                        if (distAn < bot.radio + an.radio + 70) {
+                            dirX += (bot.x - an.x) * 0.08;
+                            dirY += (bot.y - an.y) * 0.08;
+                        }
+                    }
+                }
+
+                const mag = Math.hypot(dirX, dirY);
+                if (mag > 0) {
+                    dirX /= mag;
+                    dirY /= mag;
+                }
+
+                const velMax = calcularVelocidadBase(bot.masa) * 0.92;
+                bot.vx += (dirX * velMax - bot.vx) * Math.min(1, delta * 5);
+                bot.vy += (dirY * velMax - bot.vy) * Math.min(1, delta * 5);
+
+                bot.x += bot.vx * delta;
+                bot.y += bot.vy * delta;
+
+                bot.x = Math.max(bot.radio, Math.min(MUNDO_ANCHO - bot.radio, bot.x));
+                bot.y = Math.max(bot.radio, Math.min(MUNDO_ALTO - bot.radio, bot.y));
+            });
+        }
+
+        // ========================================
+        // 9. COLISIONES Y REGLAS DE ABSORCIÓN
+        // ========================================
+
+        function actualizarFisicasYColisiones(delta) {
+            const todasCelulas = [jugador, ...bots];
+
+            // 1. Mover masa eyectada
+            for (let i = masaEyectada.length - 1; i >= 0; i--) {
+                const m = masaEyectada[i];
+                m.x += m.vx * delta;
+                m.y += m.vy * delta;
+                m.vx *= 0.92;
+                m.vy *= 0.92;
+                if (m.tiempoGracia > 0) m.tiempoGracia -= delta;
+
+                m.x = Math.max(m.radio, Math.min(MUNDO_ANCHO - m.radio, m.x));
+                m.y = Math.max(m.radio, Math.min(MUNDO_ALTO - m.radio, m.y));
+            }
+
+            // 2. Absorción de polvo estelar y estrellas
+            for (const celula of todasCelulas) {
+                for (let i = comida.length - 1; i >= 0; i--) {
+                    const c = comida[i];
+                    const dist = Math.hypot(celula.x - c.x, celula.y - c.y);
+                    if (dist < celula.radio + c.radio * 0.4) {
+                        celula.masa += c.masa;
+                        celula.radio = masaARadio(celula.masa);
+                        if (celula.esJugador && celula.masa > jugador.masaMaxima) {
+                            jugador.masaMaxima = Math.floor(celula.masa);
+                        }
+                        comida.splice(i, 1);
+                    }
+                }
+
+                // Absorción de masa eyectada
+                for (let i = masaEyectada.length - 1; i >= 0; i--) {
+                    const m = masaEyectada[i];
+                    if (celula.esJugador && m.tiempoGracia > 0) continue;
+                    const dist = Math.hypot(celula.x - m.x, celula.y - m.y);
+                    if (dist < celula.radio) {
+                        celula.masa += m.masa;
+                        celula.radio = masaARadio(celula.masa);
+                        masaEyectada.splice(i, 1);
+                    }
+                }
+            }
+
+            // Regenerar comida continuamente hasta 260 orbes
+            while (comida.length < 260) {
+                comida.push(crearOrbeComida());
+            }
+
+            // 3. Interacción con Agujeros Negros (Virus espaciales)
+            agujerosNegros.forEach(an => {
+                an.rotacion += delta * 0.8;
+
+                for (const celula of todasCelulas) {
+                    // Solo afecta si la célula es notablemente más grande que el agujero negro
+                    if (celula.radio > an.radio * 1.15) {
+                        const dist = Math.hypot(celula.x - an.x, celula.y - an.y);
+                        if (dist < celula.radio - an.radio * 0.25) {
+                            // Pierde 30% de masa y expulsa fragmentos alrededor
+                            const masaPerdida = celula.masa * 0.30;
+                            celula.masa -= masaPerdida;
+                            celula.radio = masaARadio(celula.masa);
+
+                            generarParticulas(celula.x, celula.y, "#E7A9CF", 18);
+
+                            // Expulsar orbes de energía alrededor
+                            const fragmentos = 6;
+                            for (let k = 0; k < fragmentos; k++) {
+                                const ang = (Math.PI * 2 * k) / fragmentos;
+                                masaEyectada.push({
+                                    x: celula.x + Math.cos(ang) * (celula.radio + 15),
+                                    y: celula.y + Math.sin(ang) * (celula.radio + 15),
+                                    vx: Math.cos(ang) * 260,
+                                    vy: Math.sin(ang) * 260,
+                                    masa: (masaPerdida / fragmentos) * 0.8,
+                                    radio: 8,
+                                    color: "#E7A9CF",
+                                    tiempoGracia: 0.6
+                                });
+                            }
+
+                            // Reubicar el agujero negro en otra zona
+                            const nuevoAn = crearAgujeroNegro();
+                            an.x = nuevoAn.x;
+                            an.y = nuevoAn.y;
+                        }
+                    }
+                }
+            });
+
+            // 4. Absorción entre planetas (Regla Agar.io: radio >= 1.12x del objetivo)
+            for (let i = 0; i < todasCelulas.length; i++) {
+                const a = todasCelulas[i];
+                if (!a || a.masa <= 0) continue;
+
+                for (let j = 0; j < todasCelulas.length; j++) {
+                    if (i === j) continue;
+                    const b = todasCelulas[j];
+                    if (!b || b.masa <= 0) continue;
+
+                    if (a.radio >= b.radio * 1.12) {
+                        const dist = Math.hypot(a.x - b.x, a.y - b.y);
+                        // El centro del objetivo debe entrar dentro del perímetro del depredador
+                        if (dist < a.radio - b.radio * 0.25) {
+                            a.masa += b.masa * 0.85;
+                            a.radio = masaARadio(a.masa);
+                            generarParticulas(b.x, b.y, b.colorBase, 16);
+
+                            if (a.esJugador) {
+                                jugador.absorbidos++;
+                                if (a.masa > jugador.masaMaxima) {
+                                    jugador.masaMaxima = Math.floor(a.masa);
+                                }
+                            }
+
+                            // Si el absorbido es el jugador -> Fin del juego
+                            if (b.esJugador) {
+                                b.masa = 0;
+                                terminarJuego(false, a.nombre);
+                                return;
+                            } else {
+                                // Respawn del bot absorbido
+                                const idxBot = bots.indexOf(b);
+                                if (idxBot !== -1) {
+                                    bots[idxBot] = crearBot(idxBot);
+                                }
+                                b.masa = 0;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 5. Actualizar partículas visuales
+            for (let i = particulas.length - 1; i >= 0; i--) {
+                const p = particulas[i];
+                p.x += p.vx * delta;
+                p.y += p.vy * delta;
+                p.vida -= delta * 2.2;
+                if (p.vida <= 0) particulas.splice(i, 1);
+            }
+        }
+
+        // ========================================
+        // 10. RENDERIZADO DEL MUNDO Y ENTIDADES
+        // ========================================
+
+        function dibujarFondoYCuadricula() {
+            ctx.fillStyle = "#171329";
+            ctx.fillRect(0, 0, anchoVista, altoVista);
+
+            // Estrellas con paralaje suave
+            estrellasFondo.forEach(e => {
+                const sx = (e.x - camara.x * e.paralaje) * camara.zoom + anchoVista / 2;
+                const sy = (e.y - camara.y * e.paralaje) * camara.zoom + altoVista / 2;
+
+                if (sx >= -10 && sx <= anchoVista + 10 && sy >= -10 && sy <= altoVista + 10) {
+                    ctx.globalAlpha = 0.25 + e.brillo * 0.65;
+                    ctx.fillStyle = "#FFFFFF";
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, e.radio, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+            ctx.globalAlpha = 1;
+
+            // Cuadrícula espacial del mundo
+            ctx.save();
+            ctx.translate(anchoVista / 2, altoVista / 2);
+            ctx.scale(camara.zoom, camara.zoom);
+            ctx.translate(-camara.x, -camara.y);
+
+            const pasoGrid = 80;
+            ctx.strokeStyle = "rgba(102, 83, 141, 0.16)";
+            ctx.lineWidth = 1 / camara.zoom;
+
+            const inicioX = Math.max(0, Math.floor((camara.x - (anchoVista / 2) / camara.zoom) / pasoGrid) * pasoGrid);
+            const finX = Math.min(MUNDO_ANCHO, camara.x + (anchoVista / 2) / camara.zoom + pasoGrid);
+            const inicioY = Math.max(0, Math.floor((camara.y - (altoVista / 2) / camara.zoom) / pasoGrid) * pasoGrid);
+            const finY = Math.min(MUNDO_ALTO, camara.y + (altoVista / 2) / camara.zoom + pasoGrid);
+
+            ctx.beginPath();
+            for (let x = inicioX; x <= finX; x += pasoGrid) {
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, MUNDO_ALTO);
+            }
+            for (let y = inicioY; y <= finY; y += pasoGrid) {
+                ctx.moveTo(0, y);
+                ctx.lineTo(MUNDO_ANCHO, y);
+            }
+            ctx.stroke();
+
+            // Frontera brillante del universo
+            ctx.strokeStyle = "#9B83D5";
+            ctx.lineWidth = 6;
+            ctx.strokeRect(0, 0, MUNDO_ANCHO, MUNDO_ALTO);
+
+            ctx.restore();
+        }
+
+        function dibujarComida() {
+            const tiempo = performance.now() * 0.004;
+
+            comida.forEach(c => {
+                ctx.save();
+                ctx.fillStyle = c.color;
+                ctx.shadowColor = c.color;
+                ctx.shadowBlur = c.esEstrella ? 12 : 6;
+
+                if (c.esEstrella) {
+                    const escala = 1 + Math.sin(tiempo + c.pulso) * 0.15;
+                    ctx.translate(c.x, c.y);
+                    ctx.scale(escala, escala);
+                    ctx.font = "16px Arial";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.fillText("★", 0, 0);
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(c.x, c.y, c.radio, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            });
+
+            // Dibujar masa eyectada
+            masaEyectada.forEach(m => {
+                ctx.save();
+                ctx.fillStyle = m.color;
+                ctx.shadowColor = m.color;
+                ctx.shadowBlur = 10;
+                ctx.beginPath();
+                ctx.arc(m.x, m.y, m.radio, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+        }
+
+        function dibujarAgujerosNegros() {
+            agujerosNegros.forEach(an => {
+                ctx.save();
+                ctx.translate(an.x, an.y);
+                ctx.rotate(an.rotacion);
+
+                // Aura exterior espinosa tipo virus espacial
+                const puntas = 18;
+                ctx.beginPath();
+                for (let i = 0; i < puntas * 2; i++) {
+                    const r = i % 2 === 0 ? an.radio + 6 : an.radio - 4;
+                    const ang = (Math.PI * i) / puntas;
+                    if (i === 0) ctx.moveTo(Math.cos(ang) * r, Math.sin(ang) * r);
+                    else ctx.lineTo(Math.cos(ang) * r, Math.sin(ang) * r);
+                }
+                ctx.closePath();
+                ctx.fillStyle = "rgba(48, 41, 76, 0.85)";
+                ctx.strokeStyle = "#E7A9CF";
+                ctx.lineWidth = 2.5;
+                ctx.shadowColor = "#E7A9CF";
+                ctx.shadowBlur = 15;
+                ctx.fill();
+                ctx.stroke();
+
+                // Núcleo oscuro
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = "#110D21";
+                ctx.beginPath();
+                ctx.arc(0, 0, an.radio * 0.68, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.restore();
+            });
+        }
+
+        function dibujarPlaneta(celula) {
+            ctx.save();
+            ctx.translate(celula.x, celula.y);
+
+            // Anillo orbital trasero si aplica
+            if (celula.anillo) {
+                ctx.save();
+                ctx.rotate(-0.35);
+                ctx.strokeStyle = "rgba(247, 217, 139, 0.35)";
+                ctx.lineWidth = Math.max(2, celula.radio * 0.12);
+                ctx.beginPath();
+                ctx.ellipse(0, 0, celula.radio * 1.48, celula.radio * 0.42, 0, Math.PI, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // Cuerpo principal del planeta
+            ctx.shadowColor = celula.colorBase;
+            ctx.shadowBlur = celula.esJugador ? 20 : 12;
+            ctx.fillStyle = celula.colorBase;
+            ctx.beginPath();
+            ctx.arc(0, 0, celula.radio, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Borde brillante
+            ctx.shadowBlur = 0;
+            ctx.strokeStyle = celula.colorBorde;
+            ctx.lineWidth = Math.max(2, celula.radio * 0.08);
+            ctx.stroke();
+
+            // Detalle atmosférico / cráter suave
+            ctx.fillStyle = "rgba(23, 19, 41, 0.18)";
+            ctx.beginPath();
+            ctx.arc(-celula.radio * 0.28, -celula.radio * 0.22, celula.radio * 0.25, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Anillo orbital delantero
+            if (celula.anillo) {
+                ctx.save();
+                ctx.rotate(-0.35);
+                ctx.strokeStyle = "rgba(247, 217, 139, 0.55)";
+                ctx.lineWidth = Math.max(2, celula.radio * 0.12);
+                ctx.beginPath();
+                ctx.ellipse(0, 0, celula.radio * 1.48, celula.radio * 0.42, 0, 0, Math.PI);
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // Nombre y masa dentro del planeta
+            const tamFuente = Math.max(11, Math.min(26, celula.radio * 0.38));
+            ctx.fillStyle = "#171329";
+            ctx.font = `bold ${tamFuente}px Arial`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(celula.nombre, 0, -tamFuente * 0.22);
+
+            ctx.font = `bold ${Math.max(9, tamFuente * 0.68)}px Arial`;
+            ctx.fillStyle = "#211D38";
+            ctx.fillText(Math.floor(celula.masa), 0, tamFuente * 0.55);
+
+            ctx.restore();
+        }
+
+        function dibujarParticulas() {
+            particulas.forEach(p => {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, p.vida);
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radio, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+        }
+
+        // ========================================
+        // 11. HUD DENTRO DEL CANVAS (LEADERBOARD Y MINIMAPA)
+        // ========================================
+
+        function dibujarHUDCanvas(ranking) {
+            // --- A. TOP 5 LEADERBOARD (Esquina superior derecha) ---
+            const lbAncho = 168;
+            const lbAlto = 138;
+            const lbX = anchoVista - lbAncho - 14;
+            const lbY = 14;
+
+            ctx.save();
+            ctx.fillStyle = "rgba(48, 41, 76, 0.78)";
+            ctx.strokeStyle = "rgba(155, 131, 213, 0.65)";
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.roundRect(lbX, lbY, lbAncho, lbAlto, 12);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = "#F7D98B";
+            ctx.font = "bold 12px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText("🏆 TOP GALAXIA", lbX + lbAncho / 2, lbY + 18);
+
+            ctx.font = "12px Arial";
+            for (let i = 0; i < Math.min(5, ranking.length); i++) {
+                const item = ranking[i];
+                const filaY = lbY + 38 + i * 20;
+                ctx.textAlign = "left";
+                ctx.fillStyle = item.esJugador ? "#F7D98B" : "#F8F3FF";
+                const textoNombre = `${i + 1}. ${item.nombre}`;
+                ctx.fillText(textoNombre.slice(0, 14), lbX + 10, filaY);
+
+                ctx.textAlign = "right";
+                ctx.fillStyle = item.esJugador ? "#F7D98B" : "#C9BEDD";
+                ctx.fillText(Math.floor(item.masa), lbX + lbAncho - 10, filaY);
+            }
+            ctx.restore();
+
+            // --- B. MINI-MAPA (Esquina inferior derecha) ---
+            const mapTam = 110;
+            const mapX = anchoVista - mapTam - 14;
+            const mapY = altoVista - mapTam - 14;
+
+            ctx.save();
+            ctx.fillStyle = "rgba(23, 19, 41, 0.82)";
+            ctx.strokeStyle = "rgba(155, 131, 213, 0.7)";
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.roundRect(mapX, mapY, mapTam, mapTam, 10);
+            ctx.fill();
+            ctx.stroke();
+
+            // Agujeros negros en minimapa
+            ctx.fillStyle = "#E7A9CF";
+            agujerosNegros.forEach(an => {
+                const mx = mapX + (an.x / MUNDO_ANCHO) * mapTam;
+                const my = mapY + (an.y / MUNDO_ALTO) * mapTam;
+                ctx.beginPath();
+                ctx.arc(mx, my, 2, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Bots en minimapa
+            bots.forEach(b => {
+                const mx = mapX + (b.x / MUNDO_ANCHO) * mapTam;
+                const my = mapY + (b.y / MUNDO_ALTO) * mapTam;
+                ctx.fillStyle = b.colorBase;
+                ctx.beginPath();
+                ctx.arc(mx, my, Math.max(2, (b.radio / MUNDO_ANCHO) * mapTam * 1.5), 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Jugador en minimapa (destacado en dorado)
+            const jx = mapX + (jugador.x / MUNDO_ANCHO) * mapTam;
+            const jy = mapY + (jugador.y / MUNDO_ALTO) * mapTam;
+            ctx.fillStyle = "#F7D98B";
+            ctx.shadowColor = "#F7D98B";
+            ctx.shadowBlur = 6;
+            ctx.beginPath();
+            ctx.arc(jx, jy, 3.8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+
+            // --- C. INDICADOR DE RECARGA DE IMPULSO (Esquina inferior izquierda) ---
+            ctx.save();
+            const barX = 14;
+            const barY = altoVista - 30;
+            ctx.fillStyle = "rgba(48, 41, 76, 0.8)";
+            ctx.strokeStyle = "#66538D";
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.roundRect(barX, barY, 130, 16, 8);
+            ctx.fill();
+            ctx.stroke();
+
+            const listo = jugador.cooldownImpulso <= 0 && jugador.masa >= 35;
+            const progreso = listo ? 1 : Math.max(0, 1 - jugador.cooldownImpulso / 0.85);
+            ctx.fillStyle = listo ? "#F7D98B" : "#9B83D5";
+            ctx.beginPath();
+            ctx.roundRect(barX + 2, barY + 2, (126) * progreso, 12, 6);
+            ctx.fill();
+
+            ctx.fillStyle = "#F8F3FF";
+            ctx.font = "bold 10px Arial";
+            ctx.textAlign = "left";
+            ctx.fillText(listo ? "⚡ IMPULSO LISTO" : "⚡ RECARGANDO...", barX + 4, barY - 5);
+            ctx.restore();
+        }
+
+        // ========================================
+        // 12. ACTUALIZACIÓN DE INTERFAZ SUPERIOR Y BUCLE
+        // ========================================
+
+        function obtenerRanking() {
+            const lista = [jugador, ...bots].filter(c => c.masa > 0);
+            lista.sort((a, b) => b.masa - a.masa);
+            return lista;
+        }
+
+        function actualizarInterfaz(ranking) {
+            const masaEntera = Math.floor(jugador.masa);
+            elPuntuacion.textContent = masaEntera;
+            elRango.textContent = obtenerRangoPorMasa(masaEntera);
+
+            const pos = ranking.findIndex(c => c.esJugador) + 1;
+            elPosicion.textContent = `#${pos > 0 ? pos : ranking.length} / ${ranking.length}`;
+        }
+
+        function terminarJuego(victoria, nombreVerdugo = "") {
+            jugando = false;
+
+            if (victoria) {
+                mensajeFinal.textContent = "¡Supernova Alcanzada!";
+                resultadoFinal.textContent = `¡Felicidades ${jugador.nombre}! Has dominado toda la galaxia.`;
+            } else {
+                mensajeFinal.textContent = "¡Órbita absorbida!";
+                resultadoFinal.textContent = `Tu planeta fue absorbido por ${nombreVerdugo}.`;
+            }
+
+            statMasaMax.textContent = jugador.masaMaxima;
+            statAbsorbidos.textContent = jugador.absorbidos;
+
+            pantallaFinal.classList.remove("oculto");
+        }
+
+        function dibujarEscena(ranking) {
+            dibujarFondoYCuadricula();
+
+            // Transformación de cámara del mundo
+            ctx.save();
+            ctx.translate(anchoVista / 2, altoVista / 2);
+            ctx.scale(camara.zoom, camara.zoom);
+            ctx.translate(-camara.x, -camara.y);
+
+            dibujarComida();
+            dibujarAgujerosNegros();
+
+            // Ordenar planetas de menor a mayor para que los grandes se dibujen encima
+            const ordenDibujo = [jugador, ...bots]
+                .filter(c => c.masa > 0)
+                .sort((a, b) => a.radio - b.radio);
+
+            ordenDibujo.forEach(celula => dibujarPlaneta(celula));
+
+            dibujarParticulas();
+            ctx.restore();
+
+            // Elementos fijos en pantalla
+            dibujarHUDCanvas(ranking);
+        }
+
+        function bucleJuego(tiempoActual) {
+            if (!jugando) return;
+
+            const delta = Math.min((tiempoActual - ultimoTiempo) / 1000, 0.033);
+            ultimoTiempo = tiempoActual;
+
+            moverJugador(delta);
+            moverBots(delta);
+            actualizarFisicasYColisiones(delta);
+
+            if (!jugando) return;
+
+            const ranking = obtenerRanking();
+            actualizarInterfaz(ranking);
+            dibujarEscena(ranking);
+
+            // Condición de victoria al alcanzar 1500 de masa
+            if (jugador.masa >= 1500) {
+                terminarJuego(true);
+                return;
+            }
+
+            requestAnimationFrame(bucleJuego);
+        }
+
+        // ========================================
+        // 13. INICIO Y REINICIO DE PARTIDA
+        // ========================================
+
+        function limpiarControles() {
+            Object.keys(teclas).forEach(k => teclas[k] = false);
+            document.querySelectorAll("[data-dir]").forEach(el => el.classList.remove("presionado"));
+            punteroActivo = false;
+        }
+
+        function iniciarJuego() {
+            const nombreEscrito = inputNombre.value.trim();
+            jugador.nombre = nombreEscrito || "Luna";
+            jugador.x = MUNDO_ANCHO / 2;
+            jugador.y = MUNDO_ALTO / 2;
+            jugador.masa = 28;
+            jugador.radio = masaARadio(28);
+            jugador.vx = 0;
+            jugador.vy = 0;
+            jugador.impulsoTimer = 0;
+            jugador.cooldownImpulso = 0;
+            jugador.masaMaxima = 28;
+            jugador.absorbidos = 0;
+
+            camara.x = jugador.x;
+            camara.y = jugador.y;
+            camara.zoom = 1;
+
+            crearFondoEstelar();
+
+            comida = [];
+            for (let i = 0; i < 260; i++) {
+                comida.push(crearOrbeComida());
+            }
+
+            masaEyectada = [];
+            particulas = [];
+
+            agujerosNegros = [];
+            for (let i = 0; i < 8; i++) {
+                agujerosNegros.push(crearAgujeroNegro());
+            }
+
+            bots = [];
+            for (let i = 0; i < 11; i++) {
+                bots.push(crearBot(i));
+            }
+
+            limpiarControles();
+
+            pantallaInicio.classList.add("oculto");
+            pantallaFinal.classList.add("oculto");
+
+            const rankingInicial = obtenerRanking();
+            actualizarInterfaz(rankingInicial);
+            dibujarEscena(rankingInicial);
+
+            jugando = true;
+            ultimoTiempo = performance.now();
+            requestAnimationFrame(bucleJuego);
+        }
+
+        // ========================================
+        // 14. EVENTOS DE TECLADO, MOUSE Y TÁCTIL
+        // ========================================
+
+        window.addEventListener("blur", limpiarControles);
+
+        window.addEventListener("keydown", e => {
+            const k = e.key;
+            if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(k)) {
+                if (jugando) e.preventDefault();
+            }
+            if (k === " " && jugando) {
+                activarImpulso();
+            }
+            teclas[k] = true;
+            teclas[k.toLowerCase()] = true;
+        });
+
+        window.addEventListener("keyup", e => {
+            const k = e.key;
+            teclas[k] = false;
+            teclas[k.toLowerCase()] = false;
+        });
+
+        // Control directo con ratón o dedo sobre el canvas
+        function actualizarPosicionPuntero(clienteX, clienteY) {
+            const rect = canvas.getBoundingClientRect();
+            const escalaX = anchoVista / rect.width;
+            const escalaY = altoVista / rect.height;
+            punteroPantalla.x = (clienteX - rect.left) * escalaX;
+            punteroPantalla.y = (clienteY - rect.top) * escalaY;
+            punteroActivo = true;
+        }
+
+        canvas.addEventListener("mousemove", e => {
+            if (!jugando) return;
+            actualizarPosicionPuntero(e.clientX, e.clientY);
+        });
+
+        canvas.addEventListener("mouseleave", () => {
+            punteroActivo = false;
+        });
+
+        canvas.addEventListener("touchstart", e => {
+            if (!jugando) return;
+            if (e.cancelable) e.preventDefault();
+            const toque = e.touches[0];
+            actualizarPosicionPuntero(toque.clientX, toque.clientY);
+        }, { passive: false });
+
+        canvas.addEventListener("touchmove", e => {
+            if (!jugando) return;
+            if (e.cancelable) e.preventDefault();
+            const toque = e.touches[0];
+            actualizarPosicionPuntero(toque.clientX, toque.clientY);
+        }, { passive: false });
+
+        canvas.addEventListener("touchend", () => {
+            punteroActivo = false;
+        });
+
+        // Cruceta direccional táctil
+        document.querySelectorAll("[data-dir]").forEach(elem => {
+            const dir = elem.getAttribute("data-dir");
+
+            function activar(e) {
+                if (e.cancelable) e.preventDefault();
+                punteroActivo = false;
+                teclas[dir] = true;
+                elem.classList.add("presionado");
+            }
+
+            function desactivar(e) {
+                if (e.cancelable) e.preventDefault();
+                teclas[dir] = false;
+                elem.classList.remove("presionado");
+            }
+
+            elem.addEventListener("pointerdown", activar);
+            elem.addEventListener("pointerup", desactivar);
+            elem.addEventListener("pointercancel", desactivar);
+            elem.addEventListener("lostpointercapture", desactivar);
+            elem.addEventListener("touchstart", activar, { passive: false });
+            elem.addEventListener("touchend", desactivar, { passive: false });
+        });
+
+        // Botón táctil y etiqueta de Impulso
+        const btnImpulso = document.getElementById("btnImpulso");
+        const teclaEspacio = document.getElementById("teclaEspacio");
+
+        function dispararImpulsoUI(e) {
+            if (e.cancelable) e.preventDefault();
+            activarImpulso();
+        }
+        
+        btnImpulso.addEventListener("pointerdown", dispararImpulsoUI);
+        teclaEspacio.addEventListener("pointerdown", dispararImpulsoUI);
+
+        // Botones de inicio y reinicio
+        document.getElementById("btnIniciar").addEventListener("click", iniciarJuego);
+        document.getElementById("btnReiniciar").addEventListener("click", iniciarJuego);
+
+        // Permitir iniciar con Enter en el campo de nombre
+        inputNombre.addEventListener("keydown", e => {
+            if (e.key === "Enter") iniciarJuego();
+        });
+
+        // Dibujo inicial de vista previa antes de empezar
+        window.onload = function () {
+            crearFondoEstelar();
+            for (let i = 0; i < 120; i++) comida.push(crearOrbeComida());
+            for (let i = 0; i < 6; i++) agujerosNegros.push(crearAgujeroNegro());
+            dibujarEscena([jugador]);
+        };
+    </script>
+
+</body>
+</html>
